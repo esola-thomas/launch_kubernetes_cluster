@@ -72,7 +72,9 @@ if [ ! -d "/tmp/cri-dockerd" ]; then
 fi
 
 cd /tmp/cri-dockerd
-make && sudo make install
+mkdir bin
+make cri-dockerd
+sudo install -o root -g root -m 0755 cri-dockerd /usr/local/bin/cri-dockerd
 
 # Check and configure firewall if needed
 if command_exists ufw; then
