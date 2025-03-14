@@ -20,7 +20,7 @@ configure_system
 # Update package lists
 echo "Updating package lists..."
 if [[ "${OS}" == "ubuntu" || "${OS}" == "debian" ]]; then
-    if [[ "$(lsb_release -rs)" == "24.04" ]]; then
+    if [[ "$(lsb_release -rs)" =~ ^24\.04 ]]; then
         sudo apt-get update
         sudo apt-get install ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
