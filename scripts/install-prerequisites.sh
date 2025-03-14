@@ -52,7 +52,7 @@ elif [[ "${OS}" == "rhel" || "${OS}" == "centos" || "${OS}" == "fedora" ]]; then
 fi
 
 # Install Go
-GO_VERSION="1.21.9"
+GO_VERSION="1.24.1"
 GO_TAR="go${GO_VERSION}.linux-amd64.tar.gz"
 GO_URL="https://dl.google.com/go/${GO_TAR}"
 
