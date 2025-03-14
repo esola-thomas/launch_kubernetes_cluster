@@ -39,6 +39,15 @@ fi
 : "${CONTAINER_RUNTIME_INSTALL_METHOD:="package"}"
 : "${INSTALL_PREREQUISITES:="true"}"
 
+# Determine CRI socket path based on container runtime
+if [ "${CONTAINER_RUNTIME}" == "docker" ]; then
+    CRI_SOCKET="unix:///var/run/cri-dockerd.sock"
+    echo "Using Docker as container runtime with CRI socket: ${CRI_SOCKET}"
+else
+    CRI_SOCKET="unix:///run/containerd/containerd.sock"
+    echo "Using Containerd as container runtime with CRI socket: ${CRI_SOCKET}"
+fi
+
 # Display configuration
 echo "Configuration:"
 echo "- Control Plane IP: ${CONTROL_PLANE_IP}"
@@ -46,6 +55,7 @@ echo "- Kubernetes Version: ${KUBERNETES_VERSION}"
 echo "- Container Runtime: ${CONTAINER_RUNTIME}"
 echo "- Container Runtime Install Method: ${CONTAINER_RUNTIME_INSTALL_METHOD}"
 echo "- Node Name: ${NODE_NAME}"
+echo "- CRI Socket: ${CRI_SOCKET}"
 echo ""
 
 # Execute the installation steps
@@ -64,11 +74,12 @@ bash "${SCRIPT_DIR}/scripts/install-kubernetes.sh" "${KUBERNETES_VERSION}"
 echo "Kubernetes components installed successfully."
 
 echo "Step 4: Joining the Kubernetes cluster..."
-echo "Running: kubeadm join ${CONTROL_PLANE_IP}:6443 --token ${TOKEN} --discovery-token-ca-cert-hash sha256:${DISCOVERY_TOKEN_CA_CERT_HASH} --node-name ${NODE_NAME}"
+echo "Running: kubeadm join ${CONTROL_PLANE_IP}:6443 --token ${TOKEN} --discovery-token-ca-cert-hash sha256:${DISCOVERY_TOKEN_CA_CERT_HASH} --cri-socket ${CRI_SOCKET} --node-name ${NODE_NAME}"
 
 kubeadm join ${CONTROL_PLANE_IP}:6443 \
     --token ${TOKEN} \
     --discovery-token-ca-cert-hash sha256:${DISCOVERY_TOKEN_CA_CERT_HASH} \
+    --cri-socket ${CRI_SOCKET} \
     --node-name ${NODE_NAME}
 
 echo "====================================================="

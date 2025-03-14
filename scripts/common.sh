@@ -47,6 +47,7 @@ configure_system() {
 
     # Load overlay and br_netfilter modules
     echo "Loading required kernel modules..."
+    mkdir -p /etc/modules-load.d
     cat > /etc/modules-load.d/k8s.conf << EOF
 overlay
 br_netfilter

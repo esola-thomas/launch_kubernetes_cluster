@@ -21,15 +21,34 @@ POD_NETWORK_CIDR=$2
 SERVICE_CIDR=$3
 NODE_NAME=${4:-$(hostname -s)}
 
+# Load custom configurations if exists
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [ -f "${ROOT_DIR}/config/custom-values.env" ]; then
+    source "${ROOT_DIR}/config/custom-values.env"
+fi
+
+# Set default values if not defined in custom-values.env
+: "${CONTAINER_RUNTIME:="containerd"}"
+
+# Determine CRI socket path based on container runtime
+if [ "${CONTAINER_RUNTIME}" == "docker" ]; then
+    CRI_SOCKET="unix:///var/run/cri-dockerd.sock"
+    echo "Using Docker as container runtime with CRI socket: ${CRI_SOCKET}"
+else
+    CRI_SOCKET="unix:///run/containerd/containerd.sock"
+    echo "Using Containerd as container runtime with CRI socket: ${CRI_SOCKET}"
+fi
+
 echo "Initializing Kubernetes control plane..."
 echo "- Control Plane Endpoint: ${CONTROL_PLANE_ENDPOINT}"
 echo "- Pod Network CIDR: ${POD_NETWORK_CIDR}"
 echo "- Service CIDR: ${SERVICE_CIDR}"
 echo "- Node Name: ${NODE_NAME}"
+echo "- Container Runtime: ${CONTAINER_RUNTIME}"
+echo "- CRI Socket: ${CRI_SOCKET}"
 
 # Create kubeadm config file
 KUBEADM_CONFIG_PATH="/tmp/kubeadm-config.yaml"
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if [ -f "${ROOT_DIR}/config/kubeadm-config.yaml" ]; then
     echo "Using custom kubeadm config template from ${ROOT_DIR}/config/kubeadm-config.yaml"
@@ -40,6 +59,8 @@ if [ -f "${ROOT_DIR}/config/kubeadm-config.yaml" ]; then
     sed -i "s|__POD_NETWORK_CIDR__|${POD_NETWORK_CIDR}|g" "${KUBEADM_CONFIG_PATH}"
     sed -i "s|__SERVICE_CIDR__|${SERVICE_CIDR}|g" "${KUBEADM_CONFIG_PATH}"
     sed -i "s|__NODE_NAME__|${NODE_NAME}|g" "${KUBEADM_CONFIG_PATH}"
+    # Add CRI socket replacement
+    sed -i "s|unix:///run/containerd/containerd.sock|${CRI_SOCKET}|g" "${KUBEADM_CONFIG_PATH}"
 else
     echo "Creating default kubeadm config file"
     cat > "${KUBEADM_CONFIG_PATH}" << EOF
@@ -47,7 +68,7 @@ apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 nodeRegistration:
   name: ${NODE_NAME}
-  criSocket: unix:///run/containerd/containerd.sock
+  criSocket: ${CRI_SOCKET}
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
