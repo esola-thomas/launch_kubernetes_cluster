@@ -1,0 +1,42 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+nodeRegistration:
+  name: __NODE_NAME__
+  criSocket: unix:///run/containerd/containerd.sock
+  taints: []
+  kubeletExtraArgs:
+    # Add any extra kubelet arguments here
+    node-ip: __CONTROL_PLANE_ENDPOINT__
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+networking:
+  podSubnet: __POD_NETWORK_CIDR__
+  serviceSubnet: __SERVICE_CIDR__
+kubernetesVersion: v1.29.0
+controlPlaneEndpoint: __CONTROL_PLANE_ENDPOINT__:6443
+apiServer:
+  extraArgs:
+    # Add any extra API server arguments here
+    # advertise-address: __CONTROL_PLANE_ENDPOINT__
+  timeoutForControlPlane: 4m0s
+controllerManager:
+  extraArgs:
+    # Add any extra controller manager arguments here
+scheduler:
+  extraArgs:
+    # Add any extra scheduler arguments here
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+failSwapOn: false
+# Add other kubelet configuration as needed
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: ipvs
+# Add other kube-proxy configuration as needed

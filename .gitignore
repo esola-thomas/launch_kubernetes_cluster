@@ -1,0 +1,39 @@
+# Kubernetes generated kubeconfig
+.kube/
+**/.kube/config
+
+# Local configuration files
+config/my-*.env
+config/custom-*.env
+!config/custom-values.env
+
+# Backup files
+*.backup
+*.bak
+*~
+*.swp
+*.tgz
+*.tar.gz
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Downloaded manifests
+temp/
+tmp/
+
+# Logs
+*.log
+logs/
+
+# Secrets
+secrets/
+.secrets
+*.key
+*.pem
+*_key
+kubeadm-certs.tar
+
+# Temporary join files
+join-command.txt
