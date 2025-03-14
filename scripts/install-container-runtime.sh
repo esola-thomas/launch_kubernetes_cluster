@@ -211,9 +211,15 @@ EOF
         echo "export PATH=\$PATH:/usr/local/go/bin" >> /etc/profile
     fi
     
-    # Clone and build cri-dockerd
+    # Clone and build cri-dockerd only if directory doesn't exist
     cd /tmp
-    git clone https://github.com/Mirantis/cri-dockerd.git
+    if [ ! -d "/tmp/cri-dockerd" ]; then
+        echo "Cloning cri-dockerd repository..."
+        git clone https://github.com/Mirantis/cri-dockerd.git
+    else
+        echo "cri-dockerd repository already exists, skipping clone..."
+    fi
+    
     cd cri-dockerd
     
     # Build and install cri-dockerd
