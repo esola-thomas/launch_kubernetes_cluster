@@ -65,6 +65,7 @@ if ! command -v go &> /dev/null || [[ "$(go version)" != *"go${GO_VERSION}"* ]];
 fi
 
 # Clone and install cri-dockerd
+rm -rf /tmp/cri-dockerd
 if [ ! -d "/tmp/cri-dockerd" ]; then
     echo "Cloning cri-dockerd repository..."
     git clone https://github.com/Mirantis/cri-dockerd.git /tmp/cri-dockerd
