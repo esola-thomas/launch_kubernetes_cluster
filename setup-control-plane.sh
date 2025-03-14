@@ -44,6 +44,7 @@ echo ""
 # Execute the installation steps
 if [ "${INSTALL_PREREQUISITES}" = "true" ]; then
     echo "Step 1: Installing prerequisites..."
+    rm -rf /tmp/cri-dockerd  # Clean up existing directory
     bash "${SCRIPT_DIR}/scripts/install-prerequisites.sh"
     echo "Prerequisites installed successfully."
 fi
