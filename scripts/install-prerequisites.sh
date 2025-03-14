@@ -51,6 +51,28 @@ elif [[ "${OS}" == "rhel" || "${OS}" == "centos" || "${OS}" == "fedora" ]]; then
     dnf install -y ca-certificates curl gnupg git
 fi
 
+# Install Go
+GO_VERSION="1.23"
+GO_TAR="go${GO_VERSION}.linux-amd64.tar.gz"
+GO_URL="https://golang.org/dl/${GO_TAR}"
+
+if ! command -v go &> /dev/null || [[ "$(go version)" != *"go${GO_VERSION}"* ]]; then
+    echo "Installing Go ${GO_VERSION}..."
+    curl -LO "${GO_URL}"
+    tar -C /usr/local -xzf "${GO_TAR}"
+    rm "${GO_TAR}"
+    export PATH=$PATH:/usr/local/go/bin
+fi
+
+# Clone and install cri-dockerd
+if [ ! -d "/tmp/cri-dockerd" ]; then
+    echo "Cloning cri-dockerd repository..."
+    git clone https://github.com/Mirantis/cri-dockerd.git /tmp/cri-dockerd
+fi
+
+cd /tmp/cri-dockerd
+make && sudo make install
+
 # Check and configure firewall if needed
 if command_exists ufw; then
     echo "Configuring UFW firewall rules for Kubernetes..."
