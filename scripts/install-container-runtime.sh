@@ -204,7 +204,7 @@ EOF
     # Install Go
     if ! command_exists go; then
         echo "Installing Go..."
-        GO_VERSION="1.20.6"
+        GO_VERSION="1.24.1"  # Updated from 1.20.6 to 1.21.9 for compatibility with cri-dockerd
         curl -L https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -o /tmp/go.tar.gz
         rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
         export PATH=$PATH:/usr/local/go/bin
