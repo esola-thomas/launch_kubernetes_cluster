@@ -46,9 +46,9 @@ fi
 echo "Installing required packages..."
 if [[ "${OS}" == "ubuntu" || "${OS}" == "debian" ]]; then
     sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https git
+    sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https git build-essential
 elif [[ "${OS}" == "rhel" || "${OS}" == "centos" || "${OS}" == "fedora" ]]; then
-    dnf install -y ca-certificates curl gnupg git
+    dnf install -y ca-certificates curl gnupg git make gcc
 fi
 
 # Install Go
