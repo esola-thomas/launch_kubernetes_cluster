@@ -20,7 +20,7 @@ configure_system
 # Update package lists and install Docker
 echo "Updating package lists and installing Docker..."
 sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https git build-essential
+sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https git build-essential net-tools
 
 # Remove any old Docker packages
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
