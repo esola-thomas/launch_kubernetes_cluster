@@ -222,6 +222,18 @@ EOF
     
     cd cri-dockerd
     
+    # Fix invalid Go version in go.mod file if needed
+    if grep -q "invalid go version" <<< "$(go mod tidy 2>&1)"; then
+        echo "Fixing invalid Go version in go.mod file..."
+        # Extract the problematic version and fix it
+        GO_VERSION_LINE=$(grep -n "^go " go.mod | cut -d: -f1)
+        if [ ! -z "$GO_VERSION_LINE" ]; then
+            # Replace the line with a valid Go version format (1.21 instead of 1.21.x)
+            sed -i "${GO_VERSION_LINE}s/go [0-9]\+\.[0-9]\+\.[0-9]\+/go 1.21/" go.mod
+            echo "Fixed go.mod file with Go version 1.21"
+        fi
+    fi
+    
     # Build and install cri-dockerd
     mkdir -p /usr/local/bin
     go build -o /usr/local/bin/cri-dockerd
