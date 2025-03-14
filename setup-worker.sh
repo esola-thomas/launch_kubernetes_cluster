@@ -36,6 +36,7 @@ fi
 : "${NODE_NAME:=$(hostname -s)}"
 : "${DISABLE_SWAP:="true"}"
 : "${CONTAINER_RUNTIME:="containerd"}"
+: "${CONTAINER_RUNTIME_INSTALL_METHOD:="package"}"
 : "${INSTALL_PREREQUISITES:="true"}"
 
 # Display configuration
@@ -43,6 +44,7 @@ echo "Configuration:"
 echo "- Control Plane IP: ${CONTROL_PLANE_IP}"
 echo "- Kubernetes Version: ${KUBERNETES_VERSION}"
 echo "- Container Runtime: ${CONTAINER_RUNTIME}"
+echo "- Container Runtime Install Method: ${CONTAINER_RUNTIME_INSTALL_METHOD}"
 echo "- Node Name: ${NODE_NAME}"
 echo ""
 
@@ -53,8 +55,8 @@ if [ "${INSTALL_PREREQUISITES}" = "true" ]; then
     echo "Prerequisites installed successfully."
 fi
 
-echo "Step 2: Installing container runtime (${CONTAINER_RUNTIME})..."
-bash "${SCRIPT_DIR}/scripts/install-container-runtime.sh" "${CONTAINER_RUNTIME}"
+echo "Step 2: Installing container runtime (${CONTAINER_RUNTIME}) using ${CONTAINER_RUNTIME_INSTALL_METHOD} method..."
+bash "${SCRIPT_DIR}/scripts/install-container-runtime.sh" "${CONTAINER_RUNTIME}" "${CONTAINER_RUNTIME_INSTALL_METHOD}"
 echo "Container runtime installed successfully."
 
 echo "Step 3: Installing Kubernetes components..."
