@@ -28,10 +28,21 @@ install_containerd() {
     echo "Installing containerd..."
     
     if [[ "${OS}" == "ubuntu" || "${OS}" == "debian" ]]; then
-        # Install containerd from Docker's apt repository
-        mkdir -p /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/${OS}/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${OS} ${OS_VERSION} stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+        # Install prerequisites
+        apt-get update
+        apt-get install -y ca-certificates curl gnupg
+
+        # Set up Docker's apt repository
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/${OS}/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.asc
+        chmod a+r /etc/apt/keyrings/docker.asc
+
+        # Add the repository to Apt sources
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${OS} \
+            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+            tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+        # Update apt and install containerd
         apt-get update
         apt-get install -y containerd.io
         
@@ -59,18 +70,34 @@ install_docker() {
     echo "Installing Docker Engine and cri-dockerd..."
     
     if [[ "${OS}" == "ubuntu" || "${OS}" == "debian" ]]; then
-        # Install Docker Engine
-        mkdir -p /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/${OS}/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${OS} ${OS_VERSION} stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+        # First, uninstall any conflicting packages
+        for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+            apt-get remove -y $pkg || true
+        done
+
+        # Install prerequisites
         apt-get update
-        apt-get install -y docker-ce docker-ce-cli containerd.io
+        apt-get install -y ca-certificates curl gnupg
+
+        # Set up Docker's apt repository
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/${OS}/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.asc
+        chmod a+r /etc/apt/keyrings/docker.asc
+
+        # Add the repository to Apt sources
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${OS} \
+            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+            tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+        # Install Docker Engine and related packages
+        apt-get update
+        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         
     elif [[ "${OS}" == "rhel" || "${OS}" == "centos" || "${OS}" == "fedora" ]]; then
         # Install Docker Engine
         dnf -y install yum-utils
         yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-        dnf -y install docker-ce docker-ce-cli containerd.io
+        dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     fi
     
     # Configure Docker to use systemd as cgroup driver
@@ -166,7 +193,13 @@ EOF
     systemctl enable cri-docker.service
     systemctl enable --now cri-docker.socket
     
-    echo "Docker Engine and cri-dockerd installed and configured successfully"
+    # Verify docker installation
+    echo "Verifying Docker Engine installation..."
+    if docker --version > /dev/null 2>&1; then
+        echo "Docker Engine installed and configured successfully"
+    else
+        echo "Warning: Docker installation cannot be verified"
+    fi
 }
 
 # Install the specified container runtime
