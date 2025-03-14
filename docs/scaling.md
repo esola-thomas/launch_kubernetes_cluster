@@ -28,8 +28,8 @@ This document provides instructions for scaling your Kubernetes cluster by addin
 2. On the new worker node:
    ```bash
    # Clone the repository
-   git clone https://github.com/your-username/kubernetes-deploy.git
-   cd kubernetes-deploy
+   git clone https://github.com/esola-thomas/launch_kubernetes_cluster.git
+   cd launch_kubernetes_cluster
    
    # Run the worker setup script with the token from step 1
    sudo ./setup-worker.sh <control-plane-ip> <token> <discovery-token-ca-cert-hash>
@@ -99,8 +99,8 @@ kubectl label nodes <node-name> cpu=high-performance
 3. On the new control plane node:
    ```bash
    # Clone the repository
-   git clone https://github.com/your-username/kubernetes-deploy.git
-   cd kubernetes-deploy
+   git clone https://github.com/esola-thomas/launch_kubernetes_cluster.git
+   cd launch_kubernetes_cluster
    
    # Create a custom values file
    cp config/custom-values.env config/my-custom-values.env

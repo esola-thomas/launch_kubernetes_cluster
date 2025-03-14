@@ -18,8 +18,8 @@ This repository contains everything you need to set up a Kubernetes cluster on b
 
 1. Clone this repository on your designated control plane node:
    ```bash
-   git clone https://github.com/your-username/kubernetes-deploy.git
-   cd kubernetes-deploy
+   git clone https://github.com/esola-thomas/launch_kubernetes_cluster.git
+   cd launch_kubernetes_cluster
    ```
 
 2. (Optional) Customize the configuration:
@@ -39,8 +39,8 @@ This repository contains everything you need to set up a Kubernetes cluster on b
 
 1. Clone this repository on each worker node:
    ```bash
-   git clone https://github.com/your-username/kubernetes-deploy.git
-   cd kubernetes-deploy
+   git clone https://github.com/esola-thomas/launch_kubernetes_cluster.git
+   cd launch_kubernetes_cluster
    ```
 
 2. Run the worker setup script with the join information from the control plane setup:
